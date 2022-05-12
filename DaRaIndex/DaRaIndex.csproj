@@ -7,4 +7,17 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Extension\**" />
+    <EmbeddedResource Remove="Extension\**" />
+    <None Remove="Extension\**" />
+    <Page Remove="Extension\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="IOExtension">
+      <HintPath>..\Extension\IOExtension.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
