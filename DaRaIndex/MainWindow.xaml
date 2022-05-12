@@ -7,6 +7,22 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
+        <Button Grid.Row="0" Content="Получить список папок" Click="GetFolders_Click"/>
+
+        <ListView Grid.Row="1" ItemsSource="{Binding Folders, Mode=OneWay}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Path}">Путь</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Date}">Дата изменения</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=Rate}">Оценка</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=IsIndexed}">Индексирован</GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </Window>
