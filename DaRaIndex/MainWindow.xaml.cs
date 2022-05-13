@@ -30,16 +30,30 @@ namespace DaRaIndex
             DataContext = viewModel;
         }
 
-        private void GetFoldersList_Click(object sender, RoutedEventArgs e) => viewModel.GetFoldersList();
+        private void GetFoldersList_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.GetFoldersList();
+            CheckModelError();
+        }
 
         private void IndexSelected_Click(object sender, RoutedEventArgs e)
         {
             viewModel.IndexSelected(GetSelectedIndexes(FoldersList.SelectedItems));
+            CheckModelError();
         }
 
         private void UnindexSelected_Click(object sender, RoutedEventArgs e)
         {
             viewModel.UnindexSelected(GetSelectedIndexes(FoldersList.SelectedItems));
+            CheckModelError();
+        }
+
+        private void SetDateForSelected_Click(object sender, RoutedEventArgs e)
+        {
+            if (Date.SelectedDate != null)
+                viewModel.SetDateForSelected(GetSelectedIndexes(FoldersList.SelectedItems), (DateTime)Date.SelectedDate);
+
+            CheckModelError();
         }
 
         private int[] GetSelectedIndexes(System.Collections.IList selectedItems)
@@ -50,6 +64,14 @@ namespace DaRaIndex
                 selectedIndexes[i] = FoldersList.Items.IndexOf(selectedItems[i]);
 
             return selectedIndexes;
+        }
+
+        private void CheckModelError()
+        {
+            if (!string.IsNullOrEmpty(viewModel.ErrorMessage))
+                MessageBox.Show(viewModel.ErrorMessage);
+
+            viewModel.ClearErrorMessage();
         }
     }
 }

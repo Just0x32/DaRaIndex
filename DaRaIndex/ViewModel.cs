@@ -12,11 +12,16 @@ namespace DaRaIndex
     {
         private Model model = new Model();
         public ObservableCollection<Folder> Folders { get => model.Folders; }
+        public string ErrorMessage { get => model.ErrorMessage; }
 
         public void GetFoldersList() => model.GetFoldersList();
 
         public void IndexSelected(int[] selectedIndexes) => model.IndexSelected(selectedIndexes);
 
         public void UnindexSelected(int[] selectedIndexes) => model.UnindexSelected(selectedIndexes);
+
+        public void SetDateForSelected(int[] selectedIndexes, DateTime dateTime) => model.SetDateForSelected(selectedIndexes, dateTime);
+
+        public void ClearErrorMessage() => model.ClearErrorMessage();
     }
 }

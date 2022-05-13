@@ -21,9 +21,9 @@ namespace DaRaIndex
         public static readonly int RateMinValue = 1;
         public static readonly int RateMaxValue = 5;
         private static readonly int noRate = 0;
-        private static readonly string noDate = "00.00.0000";
+        private static readonly string noDate = "";
         public ObservableCollection<Folder> Folders { get; private set; } = new ObservableCollection<Folder>();
-        public string Error { get; private set; } = string.Empty;
+        public string ErrorMessage { get; private set; } = string.Empty;
 
         public void GetFoldersList()
         {
@@ -85,7 +85,7 @@ namespace DaRaIndex
             }
             catch(IOException e)
             {
-                Error = e.Message;
+                ErrorMessage = e.Message;
             }
         }
 
@@ -112,7 +112,7 @@ namespace DaRaIndex
             }
             catch(IOException e)
             {
-                Error = e.Message;
+                ErrorMessage = e.Message;
             }
         }
 
@@ -134,7 +134,29 @@ namespace DaRaIndex
             }
             catch (IOException e)
             {
-                Error = e.Message;
+                ErrorMessage = e.Message;
+            }
+        }
+
+        public void SetDateForSelected(int[] selectedIndexes, DateTime dateTime)
+        {
+            try
+            {
+                string date = dateTime.ToString("d");
+
+                foreach (int index in selectedIndexes)
+                {
+                    if (Folders[index].IsIndexed)
+                    {
+                        Folder folder = Folders[index];
+                        Folders.RemoveAt(index);
+                        Folders.Insert(index, IndexedFolderEntity(folder.Path, date, folder.Rate));
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                ErrorMessage = e.Message;
             }
         }
 
@@ -160,5 +182,7 @@ namespace DaRaIndex
                 return path;
             }
         }
+
+        public void ClearErrorMessage() => ErrorMessage = string.Empty;
     }
 }
