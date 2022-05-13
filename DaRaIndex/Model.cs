@@ -48,11 +48,11 @@ namespace DaRaIndex
 
                 foreach (var folderPath in foldersPaths)
                 {
-                    string indexFilePath = GetIndexFilePath(folderPath);
+                    string filePath = GetIndexFilePath(folderPath);
 
-                    if (File.Exists(indexFilePath))
+                    if (File.Exists(filePath))
                     {
-                        SettingsFile.SettingsFilePath = indexFilePath;
+                        SettingsFile.SettingsFilePath = filePath;
 
                         string inputDate = SettingsFile.GetPropertyValue(dateProperty);
                         string validDate = GetValidDate(inputDate);
@@ -67,6 +67,7 @@ namespace DaRaIndex
                             SettingsFile.SetPropertyValue(rateProperty, validRate);
 
                         SettingsFile.SetPropertyValue(appProperty, appValue);
+                        File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.Hidden);
 
                         Folders.Add(IndexedFolderEntity(folderPath, validDate, validRate));
 
