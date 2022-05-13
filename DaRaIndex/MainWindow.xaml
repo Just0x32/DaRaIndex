@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaRaIndex"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" SizeToContent="Width">
+        Title="MainWindow" MinHeight="450" Height="450" MinWidth="800" WindowStartupLocation="CenterScreen" SizeToContent="Width">
     <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="10 5"/>
+        </Style>
+        
         <Style x:Key="DateTextBlock" TargetType="TextBlock">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Path=IsIndexed}" Value="True">
@@ -51,18 +55,17 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Получить список папок" Click="GetFoldersList_Click"/>
-            <Button Grid.Column="1" Content="Индексировать выбранное" Click="IndexSelected_Click"/>
-            <Button Grid.Column="2" Content="Не индексировать выбранное" Click="UnindexSelected_Click"/>
+            <Button Grid.Column="1" Content="Индексировать" Click="IndexSelected_Click"/>
+            <Button Grid.Column="2" Content="Не индексировать" Click="UnindexSelected_Click"/>
             <StackPanel Grid.Column="3" Orientation="Vertical">
                 <DatePicker x:Name="DatePicker" SelectedDateFormat="Short"/>
-                <Button Height="{Binding ElementName=DatePicker, Path=ActualHeight}"
-                        Content="Установить дату выбранному" Click="SetDateForSelected_Click"/>
+                <Button x:Name="ButtonDatePicker"
+                        Content="Установить дату" Click="SetDateForSelected_Click"/>
             </StackPanel>
             <StackPanel Grid.Column="4" Orientation="Vertical">
                 <ComboBox x:Name="RateComboBox" Height="{Binding ElementName=DatePicker, Path=ActualHeight}"
                           ItemsSource="{Binding Rates}" SelectedIndex="0"/>
-                <Button Height="{Binding ElementName=DatePicker, Path=ActualHeight}"
-                        Content="Установить оценку выбранному" Click="SetRateForSelected_Click"/>
+                <Button Content="Установить оценку" Click="SetRateForSelected_Click"/>
             </StackPanel>
         </Grid>
 
@@ -76,25 +79,34 @@
             
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
-                    <GridViewColumn Header="Путь" DisplayMemberBinding="{Binding Path=Path}"/>
-                    <GridViewColumn Header="Измененено">
+                    <GridViewColumn Header="Путь" Width="400" DisplayMemberBinding="{Binding Path=Path}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Style="{StaticResource DateTextBlock}"/>
+                                
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Оценка">
+                    <GridViewColumn x:Name="DateColumn" Header="Измененено" Width="120">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Style="{StaticResource RateTextBlock}"/>
+                                <TextBlock Width="{Binding ElementName=DateColumn, Path=ActualWidth}" TextAlignment="Center"
+                                           Style="{StaticResource DateTextBlock}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Индексация">
+                    <GridViewColumn x:Name="RateColumn" Header="Оценка" Width="120">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Style="{StaticResource IndexingTextBlock}"/>
+                                <TextBlock Width="{Binding ElementName=RateColumn, Path=ActualWidth}" TextAlignment="Center"
+                                           Style="{StaticResource RateTextBlock}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn x:Name="IndexingColumn" Header="Индексация" Width="120">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Width="{Binding ElementName=IndexingColumn, Path=ActualWidth}" TextAlignment="Center"
+                                           Style="{StaticResource IndexingTextBlock}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
