@@ -93,12 +93,16 @@ namespace DaRaIndex
                     if (!Folders[index].IsIndexed)
                     {
                         string folderPath = Folders[index].Path;
-                        File.Create(GetIndexFilePath(folderPath)).Close();
+                        string filePath = GetIndexFilePath(folderPath);
 
-                        SettingsFile.SettingsFilePath = GetIndexFilePath(folderPath);
+                        File.Create(filePath).Dispose();
+                        
+                        SettingsFile.SettingsFilePath = filePath;
                         SettingsFile.SetPropertyValue(dateProperty, noDate);
-                        SettingsFile.SetPropertyValue(rateProperty, noRate.ToString());
+                        SettingsFile.SetPropertyValue(rateProperty, noRate);
                         SettingsFile.SetPropertyValue(appProperty, appValue);
+
+                        File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.Hidden);
 
                         Folders.RemoveAt(index);
                         Folders.Insert(index, IndexedFolderEntity(folderPath));
@@ -144,8 +148,13 @@ namespace DaRaIndex
                     if (Folders[index].IsIndexed)
                     {
                         Folder folder = Folders[index];
-                        SettingsFile.SettingsFilePath = folder.Path;
+                        string filePath = GetIndexFilePath(folder.Path);
+
+                        SettingsFile.SettingsFilePath = filePath;
                         SettingsFile.SetPropertyValue(dateProperty, date);
+
+                        File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.Hidden);
+
                         Folders.RemoveAt(index);
                         Folders.Insert(index, IndexedFolderEntity(folder.Path, date, folder.Rate));
                     }
@@ -168,8 +177,13 @@ namespace DaRaIndex
                     if (Folders[index].IsIndexed)
                     {
                         Folder folder = Folders[index];
-                        SettingsFile.SettingsFilePath = folder.Path;
+                        string filePath = GetIndexFilePath(folder.Path);
+
+                        SettingsFile.SettingsFilePath = filePath;
                         SettingsFile.SetPropertyValue(rateProperty, rate);
+
+                        File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.Hidden);
+
                         Folders.RemoveAt(index);
                         Folders.Insert(index, IndexedFolderEntity(folder.Path, folder.Date, rate));
                     }
