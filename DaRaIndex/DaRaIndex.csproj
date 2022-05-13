@@ -5,6 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +13,10 @@
     <EmbeddedResource Remove="Extension\**" />
     <None Remove="Extension\**" />
     <Page Remove="Extension\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="app.ico" />
   </ItemGroup>
 
   <ItemGroup>
