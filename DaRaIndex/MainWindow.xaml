@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaRaIndex"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" SizeToContent="Width">
     <Window.Resources>
         <Style x:Key="DateTextBlock" TargetType="TextBlock">
             <Style.Triggers>
@@ -47,17 +47,23 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Получить список папок" Click="GetFoldersList_Click"/>
             <Button Grid.Column="1" Content="Индексировать выбранное" Click="IndexSelected_Click"/>
             <Button Grid.Column="2" Content="Не индексировать выбранное" Click="UnindexSelected_Click"/>
             <StackPanel Grid.Column="3" Orientation="Vertical">
-                <DatePicker x:Name="Date"/>
-                <Button Content="Установить дату выбранному" Click="SetDateForSelected_Click"/>
+                <DatePicker x:Name="DatePicker" SelectedDateFormat="Short"/>
+                <Button Height="{Binding ElementName=DatePicker, Path=ActualHeight}"
+                        Content="Установить дату выбранному" Click="SetDateForSelected_Click"/>
             </StackPanel>
-            
-            
+            <StackPanel Grid.Column="4" Orientation="Vertical">
+                <ComboBox x:Name="RateComboBox" Height="{Binding ElementName=DatePicker, Path=ActualHeight}"
+                          ItemsSource="{Binding Rates}" SelectedIndex="0"/>
+                <Button Height="{Binding ElementName=DatePicker, Path=ActualHeight}"
+                        Content="Установить оценку выбранному" Click="SetRateForSelected_Click"/>
+            </StackPanel>
         </Grid>
 
         <ListView x:Name="FoldersList" Grid.Row="1" ItemsSource="{Binding Folders, Mode=OneWay}">

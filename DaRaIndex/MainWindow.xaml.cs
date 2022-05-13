@@ -28,6 +28,7 @@ namespace DaRaIndex
         {
             InitializeComponent();
             DataContext = viewModel;
+            DatePicker.SelectedDate = DateTime.Today;
         }
 
         private void GetFoldersList_Click(object sender, RoutedEventArgs e)
@@ -50,8 +51,16 @@ namespace DaRaIndex
 
         private void SetDateForSelected_Click(object sender, RoutedEventArgs e)
         {
-            if (Date.SelectedDate != null)
-                viewModel.SetDateForSelected(GetSelectedIndexes(FoldersList.SelectedItems), (DateTime)Date.SelectedDate);
+            if (DatePicker.SelectedDate != null)
+                viewModel.SetDateForSelected(GetSelectedIndexes(FoldersList.SelectedItems), (DateTime)DatePicker.SelectedDate);
+
+            CheckModelError();
+        }
+
+        private void SetRateForSelected_Click(object sender, RoutedEventArgs e)
+        {
+            if (RateComboBox.SelectedIndex >= 0)
+                viewModel.SetRateForSelected(GetSelectedIndexes(FoldersList.SelectedItems), RateComboBox.SelectedIndex);
 
             CheckModelError();
         }

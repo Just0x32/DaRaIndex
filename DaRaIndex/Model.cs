@@ -12,18 +12,31 @@ namespace DaRaIndex
 {
     public class Model
     {
-        public static readonly string currentDirectoryPath = ".\\";
-        public static readonly string IndexFileName = "index.ind";
-        public static readonly string AppProperty = "Application";
-        public static readonly string AppValue = "DaRaIndex";
-        public static readonly string DateProperty = "Date";
-        public static readonly string RateProperty = "Rate";
-        public static readonly int RateMinValue = 1;
-        public static readonly int RateMaxValue = 5;
-        private static readonly int noRate = 0;
-        private static readonly string noDate = "";
+        private readonly string currentDirectoryPath = ".\\";
+        private readonly string indexFileName = "index.ind";
+        private readonly string appProperty = "Application";
+        private readonly string appValue = "DaRaIndex";
+        private readonly string dateProperty = "Date";
+        private readonly string rateProperty = "Rate";
+        private readonly int rateMinValue = 1;
+        private readonly int rateMaxValue = 5;
+        private readonly string noRate = string.Empty;
+        private readonly string noDate = string.Empty;
+        public List<string> Rates { get; private set; } = new List<string>();
+
         public ObservableCollection<Folder> Folders { get; private set; } = new ObservableCollection<Folder>();
         public string ErrorMessage { get; private set; } = string.Empty;
+
+        public Model()
+        {
+            if (rateMinValue > rateMaxValue)
+                throw new IndexOutOfRangeException(nameof(rateMinValue) + " bigger than " + nameof(rateMaxValue));
+
+            Rates.Add(noRate);
+
+            for (int i = rateMinValue; i <= rateMaxValue; i++)
+                Rates.Add(i.ToString());
+        }
 
         public void GetFoldersList()
         {
@@ -41,41 +54,23 @@ namespace DaRaIndex
                     {
                         SettingsFile.SettingsFilePath = indexFilePath;
 
-                        string date = GetValidDate(SettingsFile.GetPropertyValue(DateProperty));
-                        if (date == noDate)
-                            SettingsFile.SetPropertyValue(DateProperty, noDate);
+                        string inputDate = SettingsFile.GetPropertyValue(dateProperty);
+                        string validDate = GetValidDate(inputDate);
 
-                        int rate = GetValidRate(SettingsFile.GetPropertyValue(RateProperty));
-                        if (rate == noRate)
-                            SettingsFile.SetPropertyValue(RateProperty, noRate.ToString());
+                        if (validDate != inputDate)
+                            SettingsFile.SetPropertyValue(dateProperty, validDate);
 
-                        SettingsFile.SetPropertyValue(AppProperty, AppValue);
+                        string inputRate = SettingsFile.GetPropertyValue(rateProperty);
+                        string validRate = GetValidRate(inputRate);
 
-                        Folders.Add(IndexedFolderEntity(folderPath, date, rate));
+                        if (validRate != inputRate)
+                            SettingsFile.SetPropertyValue(rateProperty, validRate);
 
-                        string GetValidDate(string date)
-                        {
-                            if (string.IsNullOrEmpty(date))
-                            {
-                                return noDate;
-                            }
-                            else
-                            {
-                                return date;
-                            }
-                        }
+                        SettingsFile.SetPropertyValue(appProperty, appValue);
 
-                        int GetValidRate(string rate)
-                        {
-                            if (int.TryParse(rate, out int validRate) && validRate >= RateMinValue && validRate <= RateMaxValue)
-                            {
-                                return validRate;
-                            }
-                            else
-                            {
-                                return noRate;
-                            }
-                        }
+                        Folders.Add(IndexedFolderEntity(folderPath, validDate, validRate));
+
+                        
                     }
                     else
                     {
@@ -101,9 +96,9 @@ namespace DaRaIndex
                         File.Create(GetIndexFilePath(folderPath)).Close();
 
                         SettingsFile.SettingsFilePath = GetIndexFilePath(folderPath);
-                        SettingsFile.SetPropertyValue(DateProperty, noDate);
-                        SettingsFile.SetPropertyValue(RateProperty, noRate.ToString());
-                        SettingsFile.SetPropertyValue(AppProperty, AppValue);
+                        SettingsFile.SetPropertyValue(dateProperty, noDate);
+                        SettingsFile.SetPropertyValue(rateProperty, noRate.ToString());
+                        SettingsFile.SetPropertyValue(appProperty, appValue);
 
                         Folders.RemoveAt(index);
                         Folders.Insert(index, IndexedFolderEntity(folderPath));
@@ -149,6 +144,8 @@ namespace DaRaIndex
                     if (Folders[index].IsIndexed)
                     {
                         Folder folder = Folders[index];
+                        SettingsFile.SettingsFilePath = folder.Path;
+                        SettingsFile.SetPropertyValue(dateProperty, date);
                         Folders.RemoveAt(index);
                         Folders.Insert(index, IndexedFolderEntity(folder.Path, date, folder.Rate));
                     }
@@ -160,16 +157,78 @@ namespace DaRaIndex
             }
         }
 
-        private string GetIndexFilePath(string folderPath) => folderPath + "\\" + IndexFileName;
+        public void SetRateForSelected(int[] selectedIndexes, int rateIndex)
+        {
+            try
+            {
+                string rate = Rates[rateIndex];
+
+                foreach (int index in selectedIndexes)
+                {
+                    if (Folders[index].IsIndexed)
+                    {
+                        Folder folder = Folders[index];
+                        SettingsFile.SettingsFilePath = folder.Path;
+                        SettingsFile.SetPropertyValue(rateProperty, rate);
+                        Folders.RemoveAt(index);
+                        Folders.Insert(index, IndexedFolderEntity(folder.Path, folder.Date, rate));
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                ErrorMessage = e.Message;
+            }
+        }
+
+        private string GetIndexFilePath(string folderPath) => folderPath + "\\" + indexFileName;
 
         private Folder NotIndexedFolderEntity(string folderPath)
-            => new Folder(GetShortPath(folderPath), string.Empty, default, false);
+            => new Folder(GetShortPath(folderPath), string.Empty, string.Empty, false);
 
         private Folder IndexedFolderEntity(string folderPath)
             => new Folder(GetShortPath(folderPath), noDate, noRate, true);
 
-        private Folder IndexedFolderEntity(string folderPath, string date, int rate)
+        private Folder IndexedFolderEntity(string folderPath, string date, string rate)
             => new Folder(GetShortPath(folderPath), date, rate, true);
+
+        private string GetValidDate(string date)
+        {
+            if (string.IsNullOrEmpty(date))
+            {
+                return noDate;
+            }
+            else
+            {
+                return date;
+            }
+        }
+
+        private string GetValidRate(string rate)
+        {
+            if (rate is null)
+                return noRate;
+
+            bool isFound = false;
+
+            foreach (string validRate in Rates)
+            {
+                if (validRate == rate)
+                {
+                    isFound = true;
+                    break;
+                }
+            }
+
+            if (isFound)
+            {
+                return rate;
+            }
+            else
+            {
+                return noRate;
+            }
+        }
 
         private string GetShortPath(string path)
         {

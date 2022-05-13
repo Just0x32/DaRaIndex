@@ -10,10 +10,10 @@ namespace DaRaIndex
     {
         public string Path { get; private set; }
         public string Date { get; private set; }
-        public int Rate { get; private set; }
+        public string Rate { get; private set; }
         public bool IsIndexed { get; private set; }
 
-        public Folder(string path, string date, int rate, bool isIndexed)
+        public Folder(string path, string date, string rate, bool isIndexed)
         {
             if (path is null)
                 throw new NullReferenceException(nameof(path));
