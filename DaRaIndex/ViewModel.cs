@@ -14,5 +14,9 @@ namespace DaRaIndex
         public ObservableCollection<Folder> Folders { get => model.Folders; }
 
         public void GetFoldersList() => model.GetFoldersList();
+
+        public void IndexSelected(int[] selectedIndexes) => model.IndexSelected(selectedIndexes);
+
+        public void UnindexSelected(int[] selectedIndexes) => model.UnindexSelected(selectedIndexes);
     }
 }

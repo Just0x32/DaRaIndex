@@ -12,9 +12,21 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0" Content="Получить список папок" Click="GetFolders_Click"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding Folders, Mode=OneWay}">
+            <Button Grid.Column="0" Content="Получить список папок" Click="GetFoldersList_Click"/>
+            <Button Grid.Column="1" Content="Индексировать выбранное" Click="IndexSelected_Click"/>
+            <Button Grid.Column="2" Content="Не индексировать выбранное" Click="UnindexSelected_Click"/>
+        </Grid>
+
+        
+
+        <ListView x:Name="FoldersList" Grid.Row="1" ItemsSource="{Binding Folders, Mode=OneWay}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Path=Path}">Путь</GridViewColumn>

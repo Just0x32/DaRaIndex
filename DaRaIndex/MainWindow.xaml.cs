@@ -30,6 +30,26 @@ namespace DaRaIndex
             DataContext = viewModel;
         }
 
-        private void GetFolders_Click(object sender, RoutedEventArgs e) => viewModel.GetFoldersList();
+        private void GetFoldersList_Click(object sender, RoutedEventArgs e) => viewModel.GetFoldersList();
+
+        private void IndexSelected_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.IndexSelected(GetSelectedIndexes(FoldersList.SelectedItems));
+        }
+
+        private void UnindexSelected_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.UnindexSelected(GetSelectedIndexes(FoldersList.SelectedItems));
+        }
+
+        private int[] GetSelectedIndexes(System.Collections.IList selectedItems)
+        {
+            int[] selectedIndexes = new int[selectedItems.Count];
+
+            for (int i = 0; i < selectedItems.Count; i++)
+                selectedIndexes[i] = FoldersList.Items.IndexOf(selectedItems[i]);
+
+            return selectedIndexes;
+        }
     }
 }
