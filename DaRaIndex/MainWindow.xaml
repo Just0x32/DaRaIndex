@@ -6,6 +6,35 @@
         xmlns:local="clr-namespace:DaRaIndex"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="DateTextBlock" TargetType="TextBlock">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=IsIndexed}" Value="True">
+                    <Setter Property="Text" Value="{Binding Path=Date}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="RateTextBlock" TargetType="TextBlock">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=IsIndexed}" Value="True">
+                    <Setter Property="Text" Value="{Binding Path=Rate}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Rate}" Value="0">
+                    <Setter Property="Text" Value=""/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="IndexingTextBlock" TargetType="TextBlock">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=IsIndexed}" Value="True">
+                    <Setter Property="Text" Value="Да"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -24,15 +53,38 @@
             <Button Grid.Column="2" Content="Не индексировать выбранное" Click="UnindexSelected_Click"/>
         </Grid>
 
-        
-
         <ListView x:Name="FoldersList" Grid.Row="1" ItemsSource="{Binding Folders, Mode=OneWay}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                  
+                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            
             <ListView.View>
-                <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Path}">Путь</GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Date}">Дата изменения</GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=Rate}">Оценка</GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Path=IsIndexed}">Индексирован</GridViewColumn>
+                <GridView AllowsColumnReorder="False">
+                    <GridViewColumn Header="Путь" DisplayMemberBinding="{Binding Path=Path}"/>
+                    <GridViewColumn Header="Измененено">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Style="{StaticResource DateTextBlock}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Оценка">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Style="{StaticResource RateTextBlock}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Индексация">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Style="{StaticResource IndexingTextBlock}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
