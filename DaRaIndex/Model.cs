@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IOExtension;
+using System.Globalization;
+using System.Threading;
 
 namespace DaRaIndex
 {
@@ -29,6 +31,9 @@ namespace DaRaIndex
 
         public Model()
         {
+            CultureInfo cultureInfo = new CultureInfo("en-EN");
+            Thread.CurrentThread.CurrentCulture = cultureInfo;
+
             if (rateMinValue > rateMaxValue)
                 throw new IndexOutOfRangeException(nameof(rateMinValue) + " bigger than " + nameof(rateMaxValue));
 
@@ -42,44 +47,92 @@ namespace DaRaIndex
         {
             try
             {
-                string[] foldersPaths = Directory.GetDirectories(currentDirectoryPath, "*", SearchOption.AllDirectories);
-                Array.Sort(foldersPaths);
-                Folders.Clear();
+                string[] topFoldersPaths = Directory.GetDirectories(currentDirectoryPath, "*", SearchOption.TopDirectoryOnly);
 
-                foreach (var folderPath in foldersPaths)
+                if (topFoldersPaths != null && topFoldersPaths.Length > 0)
                 {
-                    string filePath = GetIndexFilePath(folderPath);
+                    List<string> allFoldersPaths = GetAllFoldersPaths(topFoldersPaths);
+                    allFoldersPaths.Sort();
+                    Folders.Clear();
 
-                    if (File.Exists(filePath))
+                    foreach (var folderPath in allFoldersPaths)
+                        Folders.Add(GetFolderEntity(folderPath));
+
+                    List<string> GetAllFoldersPaths(string[] topFoldersPaths)
                     {
-                        SettingsFile.SettingsFilePath = filePath;
+                        bool isUnauthorizedAccessException;
+                        List<string[]> allFoldersPaths = new List<string[]>();
+                        int i = 0;
 
-                        string inputDate = SettingsFile.GetPropertyValue(dateProperty);
-                        string validDate = GetValidDate(inputDate);
+                        do
+                        {
+                            isUnauthorizedAccessException = false;
 
-                        if (validDate != inputDate)
-                            SettingsFile.SetPropertyValue(dateProperty, validDate);
+                            try
+                            {
+                                while (i < topFoldersPaths.Length)
+                                {
+                                    string[] subFoldersPaths = Directory.GetDirectories(topFoldersPaths[i], "*", SearchOption.AllDirectories);
+                                    allFoldersPaths.Add(subFoldersPaths);
+                                    allFoldersPaths.Add(new string[] { topFoldersPaths[i] });
+                                    i++;
+                                }
+                            }
+                            catch (UnauthorizedAccessException)
+                            {
+                                isUnauthorizedAccessException = true;
+                                i++;
+                            }
 
-                        string inputRate = SettingsFile.GetPropertyValue(rateProperty);
-                        string validRate = GetValidRate(inputRate);
+                        } while (isUnauthorizedAccessException);
 
-                        if (validRate != inputRate)
-                            SettingsFile.SetPropertyValue(rateProperty, validRate);
+                        return GetNormilizedList(allFoldersPaths);
 
-                        SettingsFile.SetPropertyValue(appProperty, appValue);
-                        File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.Hidden);
+                        List<string> GetNormilizedList(List<string[]> listWithArrays)
+                        {
+                            List<string> normilizedList = new List<string>();
 
-                        Folders.Add(IndexedFolderEntity(folderPath, validDate, validRate));
+                            for (int i = 0; i < listWithArrays.Count; i++)
+                            {
+                                foreach (string item in listWithArrays[i])
+                                    normilizedList.Add(item);
+                            }
 
-                        
+                            return normilizedList;
+                        }
                     }
-                    else
+
+                    Folder GetFolderEntity(string folderPath)
                     {
-                        Folders.Add(NotIndexedFolderEntity(folderPath));
+                        string filePath = GetIndexFilePath(folderPath);
+
+                        if (File.Exists(filePath))
+                        {
+                            SettingsFile.SettingsFilePath = filePath;
+
+                            string inputDate = SettingsFile.GetPropertyValue(dateProperty);
+                            string validDate = GetValidDate(inputDate);
+
+                            if (validDate != inputDate)
+                                SettingsFile.SetPropertyValue(dateProperty, validDate);
+
+                            string inputRate = SettingsFile.GetPropertyValue(rateProperty);
+                            string validRate = GetValidRate(inputRate);
+
+                            if (validRate != inputRate)
+                                SettingsFile.SetPropertyValue(rateProperty, validRate);
+
+                            SettingsFile.SetPropertyValue(appProperty, appValue);
+                            File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.Hidden);
+
+                            return IndexedFolderEntity(folderPath, validDate, validRate);
+                        }
+                        else
+                            return NotIndexedFolderEntity(folderPath);
                     }
                 }
             }
-            catch(IOException e)
+            catch(Exception e)
             {
                 ErrorMessage = e.Message;
             }
