@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaRaIndex"
         mc:Ignorable="d"
-        Title="MainWindow" MinHeight="450" Height="450" MinWidth="800" WindowStartupLocation="CenterScreen" SizeToContent="Width">
+        Title="DaRaIndex" MinHeight="450" Height="450" MinWidth="800" WindowStartupLocation="CenterScreen" SizeToContent="Width">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Padding" Value="10 5"/>
